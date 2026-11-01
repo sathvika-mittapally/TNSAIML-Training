@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Predict Air Quality Index (AQI) using environmental data with machine learning. Get real-time health recommendations based on PM2.5, PM10, NO2, SO2, CO, O3 levels.">
+    <title>AQI Predictor — Air Quality Index Prediction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Animated Background Particles -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <circle cx="14" cy="14" r="12" stroke="url(#navGrad)" stroke-width="2.5" fill="none"/>
+                    <circle cx="14" cy="14" r="6" fill="url(#navGrad)" opacity="0.6"/>
+                    <circle cx="14" cy="14" r="3" fill="url(#navGrad)"/>
+                    <defs>
+                        <linearGradient id="navGrad" x1="0" y1="0" x2="28" y2="28">
+                            <stop stop-color="#06d6a0"/>
+                            <stop offset="1" stop-color="#118ab2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <span class="nav-title">AQI Predictor</span>
+        </div>
+        <div class="nav-links">
+            <a href="#predictor" class="nav-link active">Predict</a>
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+            <a href="#aqi-scale" class="nav-link">AQI Scale</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                ML-Powered Prediction
+            </div>
+            <h1 class="hero-title">
+                Air Quality<br>
+                <span class="gradient-text">Intelligence</span>
+            </h1>
+            <p class="hero-subtitle">
+                Predict the Air Quality Index using real-time environmental data. 
+                Powered by advanced machine learning models trained on EPA standards.
+            </p>
+            <a href="#predictor" class="hero-cta">
+                <span>Start Predicting</span>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M4 10h12m-4-4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-value">9</span>
+                    <span class="stat-label">Parameters</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-value" id="modelAccuracy">~95%</span>
+                    <span class="stat-label">Accuracy</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-value">&lt;1s</span>
+                    <span class="stat-label">Prediction</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="aqi-orb">
+                <div class="orb-ring ring-1"></div>
+                <div class="orb-ring ring-2"></div>
+                <div class="orb-ring ring-3"></div>
+                <div class="orb-core">
+                    <span class="orb-value">AQI</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Predictor Section -->
+    <section class="predictor-section" id="predictor">
+        <div class="section-header">
+            <span class="section-tag">Prediction Engine</span>
+            <h2 class="section-title">Enter Environmental Data</h2>
+            <p class="section-desc">Input the pollutant concentrations and meteorological conditions below</p>
+        </div>
+
+        <div class="predictor-layout">
+            <!-- Input Form -->
+            <div class="input-panel">
+                <form id="aqiForm" autocomplete="off">
+                    <!-- Pollutants Group -->
+                    <div class="input-group">
+                        <div class="group-header">
+                            <div class="group-icon pollutant-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <circle cx="7" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+                                    <circle cx="13" cy="7" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+                                    <circle cx="14" cy="14" r="2" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                            <h3>Pollutant Concentrations</h3>
+                        </div>
+                        <div class="input-grid">
+                            <div class="input-card" id="input-pm25">
+                                <div class="input-header">
+                                    <label for="pm25">PM2.5</label>
+                                    <span class="input-unit">µg/m³</span>
+                                </div>
+                                <input type="number" id="pm25" name="pm25" placeholder="35.0" min="0" max="500" step="0.1" required>
+                                <div class="input-range-label">0 - 500</div>
+                            </div>
+                            <div class="input-card" id="input-pm10">
+                                <div class="input-header">
+                                    <label for="pm10">PM10</label>
+                                    <span class="input-unit">µg/m³</span>
+                                </div>
+                                <input type="number" id="pm10" name="pm10" placeholder="70.0" min="0" max="600" step="0.1" required>
+                                <div class="input-range-label">0 - 600</div>
+                            </div>
+                            <div class="input-card" id="input-no2">
+                                <div class="input-header">
+                                    <label for="no2">NO₂</label>
+                                    <span class="input-unit">ppb</span>
+                                </div>
+                                <input type="number" id="no2" name="no2" placeholder="40.0" min="0" max="400" step="0.1" required>
+                                <div class="input-range-label">0 - 400</div>
+                            </div>
+                            <div class="input-card" id="input-so2">
+                                <div class="input-header">
+                                    <label for="so2">SO₂</label>
+                                    <span class="input-unit">ppb</span>
+                                </div>
+                                <input type="number" id="so2" name="so2" placeholder="20.0" min="0" max="300" step="0.1" required>
+                                <div class="input-range-label">0 - 300</div>
+                            </div>
+                            <div class="input-card" id="input-co">
+                                <div class="input-header">
+                                    <label for="co">CO</label>
+                                    <span class="input-unit">ppm</span>
+                                </div>
+                                <input type="number" id="co" name="co" placeholder="2.0" min="0" max="30" step="0.01" required>
+                                <div class="input-range-label">0 - 30</div>
+                            </div>
+                            <div class="input-card" id="input-o3">
+                                <div class="input-header">
+                                    <label for="o3">O₃</label>
+                                    <span class="input-unit">ppb</span>
+                                </div>
+                                <input type="number" id="o3" name="o3" placeholder="50.0" min="0" max="300" step="0.1" required>
+                                <div class="input-range-label">0 - 300</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weather Group -->
+                    <div class="input-group">
+                        <div class="group-header">
+                            <div class="group-icon weather-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M10 3v2m0 10v2M3 10h2m10 0h2M5.05 5.05l1.41 1.41m7.08 7.08l1.41 1.41M5.05 14.95l1.41-1.41m7.08-7.08l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <h3>Weather Conditions</h3>
+                        </div>
+                        <div class="input-grid three-col">
+                            <div class="input-card" id="input-temperature">
+                                <div class="input-header">
+                                    <label for="temperature">Temperature</label>
+                                    <span class="input-unit">°C</span>
+                                </div>
+                                <input type="number" id="temperature" name="temperature" placeholder="28.0" min="-10" max="50" step="0.1" required>
+                                <div class="input-range-label">-10 to 50</div>
+                            </div>
+                            <div class="input-card" id="input-humidity">
+                                <div class="input-header">
+                                    <label for="humidity">Humidity</label>
+                                    <span class="input-unit">%</span>
+                                </div>
+                                <input type="number" id="humidity" name="humidity" placeholder="60.0" min="10" max="100" step="0.1" required>
+                                <div class="input-range-label">10 - 100</div>
+                            </div>
+                            <div class="input-card" id="input-windspeed">
+                                <div class="input-header">
+                                    <label for="wind_speed">Wind Speed</label>
+                                    <span class="input-unit">km/h</span>
+                                </div>
+                                <input type="number" id="wind_speed" name="wind_speed" placeholder="8.0" min="0" max="50" step="0.1" required>
+                                <div class="input-range-label">0 - 50</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-predict" id="predictBtn">
+                            <span class="btn-text">Predict AQI</span>
+                            <span class="btn-loader" id="btnLoader">
+                                <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="40" stroke-dashoffset="10"><animateTransform attributeName="transform" type="rotate" from="0 10 10" to="360 10 10" dur="0.8s" repeatCount="indefinite"/></circle></svg>
+                            </span>
+                            <svg class="btn-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4 10h12m-4-4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn-sample" id="sampleBtn" title="Fill with sample data">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M3 9.5l4 4L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Sample Data
+                        </button>
+                        <button type="reset" class="btn-reset" id="resetBtn">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M3 9a6 6 0 1 1 1.76 4.24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M3 13V9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel" id="resultsPanel">
+                <!-- Empty State -->
+                <div class="results-empty" id="resultsEmpty">
+                    <div class="empty-illustration">
+                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                            <circle cx="40" cy="40" r="30" stroke="url(#emptyGrad)" stroke-width="2" stroke-dasharray="6 4" opacity="0.4"/>
+                            <circle cx="40" cy="40" r="18" stroke="url(#emptyGrad)" stroke-width="1.5" opacity="0.3"/>
+                            <path d="M40 30v12m0 6v2" stroke="url(#emptyGrad)" stroke-width="2" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="emptyGrad" x1="10" y1="10" x2="70" y2="70">
+                                    <stop stop-color="#06d6a0"/>
+                                    <stop offset="1" stop-color="#118ab2"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3>Ready to Predict</h3>
+                    <p>Enter environmental parameters and click <strong>Predict AQI</strong> to see results</p>
+                </div>
+
+                <!-- Results Content (hidden by default) -->
+                <div class="results-content" id="resultsContent" style="display:none;">
+                    <!-- AQI Gauge -->
+                    <div class="aqi-result-card">
+                        <div class="result-label">Predicted Air Quality Index</div>
+                        <div class="aqi-gauge-wrapper">
+                            <svg class="aqi-gauge" viewBox="0 0 200 120" id="aqiGauge">
+                                <!-- Background arc -->
+                                <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
+                                <!-- Colored segments -->
+                                <path d="M20 100 A80 80 0 0 1 46.67 36.67" fill="none" stroke="#00e400" stroke-width="14" stroke-linecap="round" opacity="0.3"/>
+                                <path d="M46.67 36.67 A80 80 0 0 1 100 20" fill="none" stroke="#ffff00" stroke-width="14" stroke-linecap="round" opacity="0.3"/>
+                                <path d="M100 20 A80 80 0 0 1 153.33 36.67" fill="none" stroke="#ff7e00" stroke-width="14" stroke-linecap="round" opacity="0.3"/>
+                                <path d="M153.33 36.67 A80 80 0 0 1 180 100" fill="none" stroke="#ff0000" stroke-width="14" stroke-linecap="round" opacity="0.3"/>
+                                <!-- Value arc (animated) -->
+                                <path id="gaugeArc" d="M20 100 A80 80 0 0 1 20 100" fill="none" stroke="#06d6a0" stroke-width="14" stroke-linecap="round"/>
+                                <!-- Needle -->
+                                <line id="gaugeNeedle" x1="100" y1="100" x2="100" y2="30" stroke="white" stroke-width="2" stroke-linecap="round" transform="rotate(-90, 100, 100)"/>
+                                <circle cx="100" cy="100" r="5" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="aqi-value-display">
+                            <span class="aqi-number" id="aqiValue">--</span>
+                            <span class="aqi-max">/ 500</span>
+                        </div>
+                        <div class="aqi-category-badge" id="aqiBadge">
+                            <span id="aqiEmoji"></span>
+                            <span id="aqiCategory">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Health Info -->
+                    <div class="health-card" id="healthCard">
+                        <div class="health-header">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 18s-7-4.35-7-9.5A4.5 4.5 0 0 1 10 5.5 4.5 4.5 0 0 1 17 8.5c0 5.15-7 9.5-7 9.5z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            </svg>
+                            <h4>Health Advisory</h4>
+                        </div>
+                        <p id="healthDescription" class="health-desc"></p>
+                        <div class="health-advice-grid">
+                            <div class="advice-item">
+                                <span class="advice-label">General Public</span>
+                                <p id="healthAdvice"></p>
+                            </div>
+                            <div class="advice-item">
+                                <span class="advice-label">Sensitive Groups</span>
+                                <p id="sensitiveAdvice"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature Contributions -->
+                    <div class="contributions-card">
+                        <h4>
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <rect x="2" y="10" width="3" height="6" rx="1" fill="currentColor" opacity="0.4"/>
+                                <rect x="7.5" y="6" width="3" height="10" rx="1" fill="currentColor" opacity="0.6"/>
+                                <rect x="13" y="2" width="3" height="14" rx="1" fill="currentColor"/>
+                            </svg>
+                            Feature Impact
+                        </h4>
+                        <div id="contributionBars" class="contribution-bars"></div>
+                    </div>
+
+                    <!-- Model Info -->
+                    <div class="model-info-card">
+                        <div class="model-meta">
+                            <span class="model-badge" id="modelName">Random Forest</span>
+                            <span class="model-metric">R² <strong id="modelR2">0.95</strong></span>
+                            <span class="model-metric">MAE <strong id="modelMAE">5.2</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-section" id="how-it-works">
+        <div class="section-header">
+            <span class="section-tag">Methodology</span>
+            <h2 class="section-title">How It Works</h2>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <div class="step-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <path d="M8 24V14m6 10V10m6 14V6m6 18v-8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3>Input Data</h3>
+                <p>Enter pollutant concentrations (PM2.5, PM10, NO₂, SO₂, CO, O₃) and weather conditions</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <div class="step-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 16l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3>ML Processing</h3>
+                <p>Data is normalized and fed into our trained Random Forest / Gradient Boosting ensemble model</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <div class="step-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 6v4m0 12v4M6 16h4m12 0h4M9.17 9.17l2.83 2.83m8 8l2.83 2.83M9.17 22.83l2.83-2.83m8-8l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3>AQI Prediction</h3>
+                <p>Get instant AQI prediction with EPA-standard categorization, health advisories, and feature analysis</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AQI Scale Reference -->
+    <section class="scale-section" id="aqi-scale">
+        <div class="section-header">
+            <span class="section-tag">Reference</span>
+            <h2 class="section-title">AQI Scale</h2>
+        </div>
+        <div class="scale-grid">
+            <div class="scale-card" style="--scale-color: #00e400">
+                <div class="scale-range">0 - 50</div>
+                <div class="scale-name">Good</div>
+                <div class="scale-bar"></div>
+            </div>
+            <div class="scale-card" style="--scale-color: #ffff00">
+                <div class="scale-range">51 - 100</div>
+                <div class="scale-name">Moderate</div>
+                <div class="scale-bar"></div>
+            </div>
+            <div class="scale-card" style="--scale-color: #ff7e00">
+                <div class="scale-range">101 - 150</div>
+                <div class="scale-name">Unhealthy (Sensitive)</div>
+                <div class="scale-bar"></div>
+            </div>
+            <div class="scale-card" style="--scale-color: #ff0000">
+                <div class="scale-range">151 - 200</div>
+                <div class="scale-name">Unhealthy</div>
+                <div class="scale-bar"></div>
+            </div>
+            <div class="scale-card" style="--scale-color: #8f3f97">
+                <div class="scale-range">201 - 300</div>
+                <div class="scale-name">Very Unhealthy</div>
+                <div class="scale-bar"></div>
+            </div>
+            <div class="scale-card" style="--scale-color: #7e0023">
+                <div class="scale-range">301 - 500</div>
+                <div class="scale-name">Hazardous</div>
+                <div class="scale-bar"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>AQI Predictor — Powered by Machine Learning</p>
+            <p class="footer-note">Based on EPA Air Quality Index standards. For informational purposes only.</p>
+        </div>
+    </footer>
+
+    <!-- Error Toast -->
+    <div class="toast" id="errorToast">
+        <div class="toast-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M10 6v5m0 3v0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <span id="toastMessage">Error occurred</span>
+        <button class="toast-close" onclick="hideToast()">×</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

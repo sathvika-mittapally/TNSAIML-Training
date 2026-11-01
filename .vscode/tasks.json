@@ -1,0 +1,42 @@
+{
+    // VS Code task definitions
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Generate Dataset",
+            "type": "process",
+            "command": "python",
+            "args": ["${workspaceFolder}/data/generate_dataset.py"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Train Model",
+            "type": "process",
+            "command": "python",
+            "args": ["${workspaceFolder}/src/train_model.py"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run API",
+            "type": "process",
+            "command": "python",
+            "args": ["${workspaceFolder}/src/app.py"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

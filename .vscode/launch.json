@@ -1,0 +1,30 @@
+{
+    // VS Code launch configurations for debugging
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Generate Dataset",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/data/generate_dataset.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Train Model",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/train_model.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Flask API",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/app.py",
+            "env": {"FLASK_ENV": "development"},
+            "jinja": true,
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
